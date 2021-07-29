@@ -1,30 +1,41 @@
 
-const dogBar = document.getElementById("dog-bar");
-const spanForName = document.createElement('span');
-const dogInfo = document.getElementById("dog-info");
+//Page is already loaded because .js file was deferred 
 
-//Gets the pup objects
-fetch('http://localhost:3000/pups') //Fetches the pups
-.then((response) => response.json() //Converts the response to json
-.then((data) => getPupNames(data))) //Invokes a function that takes the objects as the parameter and adds adds a `span` with the pup's name to the dog bar
+const dogBar = document.getElementById("dog-bar"); 
+const dogInfoDiv = document.getElementById("dog-info");
 
+fetch("http://localhost:3000/pups") //Fetches the data
+.then(response => response.json()) //Parses the data into a JavaScript object
+.then(data => handlePups(data)); //Invokes a function, passing in the array of objects
 
+function handlePups(listOfPups) { //Function that handles the dog data
+    listOfPups.forEach(pup => { //Does something to each dog object
+        const pupSpan = document.createElement("span"); //Creates a span for the dog being handled
+        pupSpan.innerHTML = pup.name; //Adds the name property for the dog being handled to the span
+        dogBar.append(pupSpan); //Adds the span to the dogBar
 
-function getPupNames(pups) { //Gets each pup name property from json and sends to the function to add each name to a span
-    pups.forEach(function(pup) {
-        addPupNameToSpan(pup.name);
+        pupSpan.addEventListener('click', function() { //Adds an event listener to the dogSpan being handled
+            showPupInfo(pup); 
+            
+        })
+
+function showPupInfo(pup) { //Adds html to the dogInfoDiv by computing (interpolating) the pup's properties 
+    dogInfoDiv.innerHTML = `
+        <img src=${pup.image}> 
+        <h2>${pup.name}</h2>
+        <button>${pup.isGoodDog ? 'Good' : 'Bad'}</button>
+    `
+
+    dogInfoDiv.querySelector('button').addEventListener('click', (e) => { //Adds event listener to the new button under showPupInfo
+        pup.isGoodDog = !pup.isGoodDog; //Changes isGoodDog to the opposite value for the pup being handled
+        showPupInfo(pup); //Runs ShowPupInfo again for that specific pup
+
     })
+
+    ;
+
 }
 
-function addPupNameToSpan(pupName) { //Adds each pup name to a span and appends to the dog bar
-    let spanForName = document.createElement('span');
-    dogBar.appendChild(spanForName);
-    spanForName.append(pupName);
+    })
+
 }
-
-spanForName.addEventListener('click', function(e) { //Adds event listener
-    e.target
-})
-
-
-
